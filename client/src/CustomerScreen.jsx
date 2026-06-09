@@ -23,6 +23,7 @@ export default function CustomerScreen() {
   const [view, setView] = useState('menu');
   const [bill, setBill] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [orderStatus, setOrderStatus] = useState('ordered');
 
   // Customization Modal State
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
@@ -50,6 +51,64 @@ export default function CustomerScreen() {
       });
   }, []);
 
+  // 3. Query active order state on mount to handle refreshes
+  useEffect(() => {
+    if (!tableNumber) return;
+
+    fetch(`${API_URL}/active-order/${tableNumber}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch active order');
+        return res.json();
+      })
+      .then(data => {
+        if (data.active && data.order) {
+          setOrderStatus(data.order.status);
+          if (data.order.status === 'billed' || data.order.status === 'bill_requested') {
+            setBill(data.bill);
+            setView('bill');
+          } else {
+            setView('ordered');
+          }
+        } else {
+          setView('menu');
+        }
+      })
+      .catch(err => {
+        console.error('Error checking active order status:', err);
+      });
+  }, [tableNumber]);
+
+  const getStepStatus = (stepName) => {
+    const statusLevels = {
+      'ordered': 1,
+      'preparing': 2,
+      'ready': 3,
+      'served': 4,
+      'billed': 5,
+      'bill_requested': 5
+    };
+
+    const currentLevel = statusLevels[orderStatus] || 1;
+
+    const steps = {
+      'placed': 1,
+      'accepted': 2,
+      'preparing': 3,
+      'ready': 4,
+      'served': 5
+    };
+
+    const stepLevel = steps[stepName];
+
+    if (currentLevel > stepLevel) {
+      return { className: 'completed', node: '✓' };
+    } else if (currentLevel === stepLevel) {
+      return { className: 'active', node: '●' };
+    } else {
+      return { className: '', node: '' };
+    }
+  };
+
   // 7. Socket.IO connection
   useEffect(() => {
     const newSocket = io(API_URL, {
@@ -65,6 +124,22 @@ export default function CustomerScreen() {
       console.log('[Socket] Received bill payload:', billPayload);
       setBill(billPayload);
       setView('bill');
+    });
+
+    // 9. On "order_status_updated" event: update order status
+    newSocket.on('order_status_updated', ({ status }) => {
+      console.log('[Socket] Received status update:', status);
+      setOrderStatus(status);
+      if (status === 'ordered') {
+        setView('ordered');
+      }
+    });
+
+    // 10. On "payment_confirmed" event: transition to paid screen
+    newSocket.on('payment_confirmed', () => {
+      console.log('[Socket] Payment confirmed by server');
+      setView('paid');
+      setBill(null);
     });
 
     setSocket(newSocket);
@@ -272,40 +347,50 @@ export default function CustomerScreen() {
           <div className="timeline-container">
             <div className="timeline-line"></div>
             
-            <div className="timeline-step completed">
-              <div className="timeline-node">✓</div>
+            <div className={`timeline-step ${getStepStatus('placed').className}`}>
+              <div className={`timeline-node ${getStepStatus('placed').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('placed').node}
+              </div>
               <div className="timeline-info">
                 <h4>Order Placed</h4>
                 <p>Sent directly to kitchen</p>
               </div>
             </div>
             
-            <div className="timeline-step completed">
-              <div className="timeline-node">✓</div>
+            <div className={`timeline-step ${getStepStatus('accepted').className}`}>
+              <div className={`timeline-node ${getStepStatus('accepted').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('accepted').node}
+              </div>
               <div className="timeline-info">
                 <h4>Accepted</h4>
                 <p>Kitchen staff confirmed</p>
               </div>
             </div>
             
-            <div className="timeline-step active">
-              <div className="timeline-node pulse">●</div>
+            <div className={`timeline-step ${getStepStatus('preparing').className}`}>
+              <div className={`timeline-node ${getStepStatus('preparing').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('preparing').node}
+              </div>
               <div className="timeline-info">
                 <h4>Preparing</h4>
                 <p>Chef is preparing your meal</p>
               </div>
             </div>
             
-            <div className="timeline-step">
-              <div className="timeline-node"></div>
+            <div className={`timeline-step ${getStepStatus('ready').className}`}>
+              <div className={`timeline-node ${getStepStatus('ready').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('ready').node}
+              </div>
               <div className="timeline-info">
                 <h4>Ready</h4>
                 <p>Fresh & hot at counter</p>
               </div>
             </div>
             
-            <div className="timeline-step">
-              <div className="timeline-node"></div>
+            <div className={`timeline-step ${getStepStatus('served').className}`}>
+              <div className={`timeline-node ${getStepStatus('served').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('served').node}
+              </div>
               <div className="timeline-info">
                 <h4>Served</h4>
                 <p>Delivered to table</p>
@@ -315,9 +400,20 @@ export default function CustomerScreen() {
 
           {/* Light-blue metadata panel below */}
           <div className="metadata-panel">
-            <p className="metadata-status">🍳 Kitchen status: <strong>Preparing</strong></p>
-            <p className="metadata-hint">Est. Preparation Time: <strong>~15-20 mins</strong></p>
+            <p className="metadata-status">🍳 Kitchen status: <strong>{orderStatus.charAt(0).toUpperCase() + orderStatus.slice(1)}</strong></p>
+            <p className="metadata-hint">
+              {orderStatus === 'ordered' && 'Order sent to the kitchen. Waiting for preparation to begin.'}
+              {orderStatus === 'preparing' && 'Est. Preparation Time: ~15-20 mins'}
+              {orderStatus === 'ready' && 'Your order is ready! It will be served shortly.'}
+              {orderStatus === 'served' && 'Enjoy your meal! Let us know if you need anything else.'}
+            </p>
             <p className="metadata-note">If you need extra cutlery or water, feel free to notify any staff member.</p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+            <button className="btn-secondary" onClick={() => setView('menu')} style={{ flex: 1, padding: '12px', fontWeight: 'bold' }}>
+              🍽️ Order More Food / View Menu
+            </button>
           </div>
         </div>
       </div>
@@ -475,6 +571,29 @@ export default function CustomerScreen() {
           <span className="table-label-small">Table {tableNumber}</span>
         </div>
 
+        {['ordered', 'preparing', 'ready', 'served'].includes(orderStatus) && view === 'menu' && (
+          <button 
+            className="btn-primary" 
+            onClick={() => setView('ordered')}
+            style={{ 
+              backgroundColor: '#10B981', 
+              color: 'white', 
+              padding: '12px', 
+              margin: '12px 16px 0 16px', 
+              borderRadius: '8px', 
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            🕒 Track Active Order ({orderStatus})
+          </button>
+        )}
+
         <div className="cart-items-container">
           {cartItems.length === 0 ? (
             <div className="empty-cart-state">
@@ -552,6 +671,16 @@ export default function CustomerScreen() {
             </div>
             <button className="floating-cart-cta" onClick={handlePlaceOrder}>
               Place Order 🍽
+            </button>
+          </div>
+        </div>
+      )}
+
+      {totalCartQty === 0 && ['ordered', 'preparing', 'ready', 'served'].includes(orderStatus) && view === 'menu' && (
+        <div className="floating-cart-bar" style={{ backgroundColor: '#10B981', cursor: 'pointer' }} onClick={() => setView('ordered')}>
+          <div className="floating-cart-content" style={{ justifyContent: 'center' }}>
+            <button className="floating-cart-cta" style={{ backgroundColor: 'transparent', width: '100%', border: 'none' }}>
+              🕒 Track Active Order ({orderStatus})
             </button>
           </div>
         </div>

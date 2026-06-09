@@ -71,6 +71,22 @@ export default function StaffDashboard() {
       addToast(`New order from Table ${order.tableNumber}! 🍳`, 'new-order');
     });
 
+    socket.on('order_status_updated', ({ tableNumber, status }) => {
+      console.log(`[Socket] Order status updated: Table ${tableNumber} -> ${status}`);
+      setActiveOrders(prev => {
+        if (!prev[tableNumber]) return prev;
+        return {
+          ...prev,
+          [tableNumber]: {
+            ...prev[tableNumber],
+            status
+          }
+        };
+      });
+      const statusLabel = status.toUpperCase();
+      setLastAction(`Table ${tableNumber} marked as ${statusLabel} via socket.`);
+    });
+
     socket.on('payment_confirmed', ({ tableNumber }) => {
       console.log(`[Socket] Received payment confirmation for Table ${tableNumber}`);
       
@@ -102,19 +118,36 @@ export default function StaffDashboard() {
 
   // Card status transition handlers
   const updateOrderStatus = (tableNumber, newStatus) => {
-    setActiveOrders(prev => {
-      if (!prev[tableNumber]) return prev;
-      return {
-        ...prev,
-        [tableNumber]: {
-          ...prev[tableNumber],
-          status: newStatus
-        }
-      };
-    });
-
-    const statusLabel = newStatus.toUpperCase();
-    setLastAction(`Table ${tableNumber} marked as ${statusLabel}.`);
+    fetch(`${API_URL}/order/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tableNumber, status: newStatus })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to update status');
+        return res.json();
+      })
+      .then(() => {
+        const statusLabel = newStatus.toUpperCase();
+        setLastAction(`Table ${tableNumber} marked as ${statusLabel}.`);
+        addToast(`Table ${tableNumber} marked as ${newStatus}`, 'info');
+        
+        // Update local state immediately for fast responsive feedback
+        setActiveOrders(prev => {
+          if (!prev[tableNumber]) return prev;
+          return {
+            ...prev,
+            [tableNumber]: {
+              ...prev[tableNumber],
+              status: newStatus
+            }
+          };
+        });
+      })
+      .catch(err => {
+        console.error('Error updating order status:', err);
+        addToast(`Failed to update status for Table ${tableNumber}`, 'error');
+      });
   };
 
   // "End Table & Bill" -> POST /end-table
@@ -131,7 +164,17 @@ export default function StaffDashboard() {
       .then(() => {
         setLastAction(`Bill sent for Table ${tableNumber}.`);
         addToast(`Bill sent to Table ${tableNumber} 🧾`, 'info');
-        updateOrderStatus(tableNumber, 'billed');
+        // Update local state immediately
+        setActiveOrders(prev => {
+          if (!prev[tableNumber]) return prev;
+          return {
+            ...prev,
+            [tableNumber]: {
+              ...prev[tableNumber],
+              status: 'billed'
+            }
+          };
+        });
       })
       .catch(err => {
         console.error('Bill error:', err);
@@ -223,6 +266,7 @@ export default function StaffDashboard() {
                           {order.status === 'ordered' && 'PENDING'}
                           {order.status === 'preparing' && 'PREPARING'}
                           {order.status === 'ready' && 'READY'}
+                          {order.status === 'served' && 'SERVED'}
                           {order.status === 'billed' && 'BILLED'}
                         </span>
                       </td>
@@ -245,6 +289,14 @@ export default function StaffDashboard() {
                             </button>
                           )}
                           {order.status === 'ready' && (
+                            <button 
+                              className="btn-ghost-pill action-serve"
+                              onClick={() => updateOrderStatus(tableNum, 'served')}
+                            >
+                              Mark Served
+                            </button>
+                          )}
+                          {order.status === 'served' && (
                             <button 
                               className="btn-ghost-pill action-bill"
                               onClick={() => handleEndTable(tableNum)}

@@ -2,6 +2,22 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+
+// Self-ping Render web service to prevent cold sleep (every 10 minutes)
+const RENDER_URL = process.env.RENDER_EXTERNAL_URL;
+if (RENDER_URL) {
+  const httpLib = RENDER_URL.startsWith('https') ? require('https') : require('http');
+  setInterval(() => {
+    httpLib.get(`${RENDER_URL}/menu`, (res) => {
+      console.log(`[Ping] Self-ping status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error('[Ping] Self-ping error:', err.message);
+    });
+  }, 10 * 60 * 1000); // 10 minutes
+  console.log(`[Ping] Self-ping service started for: ${RENDER_URL}`);
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -26,8 +42,11 @@ const io = new Server(server, {
   }
 });
 
+const MENU_FILE = path.join(__dirname, 'menu.json');
+const ORDERS_FILE = path.join(__dirname, 'orders.json');
+
 // In-memory data
-const menu = [
+let menu = [
   // Starters
   { id: '1', name: 'Paneer Tikka', description: 'Cottage cheese marinated in spices, grilled in tandoor', price: 220, category: 'Starters', emoji: '🧀', available: true },
   { id: '2', name: 'Veg Seekh Kebab', description: 'Minced vegetables with herbs, skewered and grilled', price: 180, category: 'Starters', emoji: '🌿', available: true },
@@ -51,7 +70,50 @@ const menu = [
 ];
 
 // Active orders keyed by tableNumber
-const activeOrders = {};
+let activeOrders = {};
+
+// Load persisted menu if it exists
+if (fs.existsSync(MENU_FILE)) {
+  try {
+    menu = JSON.parse(fs.readFileSync(MENU_FILE, 'utf8'));
+    console.log('[Persistence] Menu loaded from menu.json');
+  } catch (err) {
+    console.error('[Persistence] Error loading menu.json:', err.message);
+  }
+} else {
+  try {
+    fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  } catch (err) {
+    console.error('[Persistence] Error writing initial menu.json:', err.message);
+  }
+}
+
+// Load persisted orders if they exist
+if (fs.existsSync(ORDERS_FILE)) {
+  try {
+    activeOrders = JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf8'));
+    console.log('[Persistence] Active orders loaded from orders.json');
+  } catch (err) {
+    console.error('[Persistence] Error loading orders.json:', err.message);
+  }
+}
+
+function saveMenu() {
+  try {
+    fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  } catch (err) {
+    console.error('[Persistence] Error saving menu.json:', err.message);
+  }
+}
+
+function saveOrders() {
+  try {
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(activeOrders, null, 2));
+  } catch (err) {
+    console.error('[Persistence] Error saving orders.json:', err.message);
+  }
+}
+
 
 // REST API
 app.get('/menu', (req, res) => {
@@ -81,6 +143,7 @@ app.post('/menu', (req, res) => {
   };
 
   menu.push(newItem);
+  saveMenu();
   console.log(`[Admin] Added new menu item: ${name}`);
   res.json({ success: true, item: newItem });
 });
@@ -99,6 +162,7 @@ app.post('/menu/toggle', (req, res) => {
   }
 
   item.available = !item.available;
+  saveMenu();
   console.log(`[Admin] Toggled availability of ${item.name} to ${item.available}`);
   res.json({ success: true, item });
 });
@@ -154,14 +218,73 @@ app.post('/order', (req, res) => {
     };
   }
 
+  saveOrders();
   const currentOrder = activeOrders[tableStr];
 
   // Emit "new_order" to socket room "staff"
   io.to('staff').emit('new_order', currentOrder);
+  // Emit "order_status_updated" to table room to notify customer devices
+  io.to(`table_${tableStr}`).emit('order_status_updated', { tableNumber: tableStr, status: 'ordered', order: currentOrder });
 
   console.log(`[Order] Placed for Table ${tableStr}:`, JSON.stringify(currentOrder.items));
 
   res.json({ success: true, order: currentOrder });
+});
+
+// Retrieves the active order and bill payload (if billing requested/billed) for a table
+app.get('/active-order/:tableNumber', (req, res) => {
+  const tableStr = String(req.params.tableNumber);
+  const order = activeOrders[tableStr];
+
+  if (!order) {
+    return res.json({ active: false });
+  }
+
+  let bill = null;
+  if (order.status === 'billed' || order.status === 'bill_requested') {
+    const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const taxRate = 0.08; // 8% tax
+    const tax = Number((subtotal * taxRate).toFixed(2));
+    const serviceChargeRate = 0.10; // 10% service charge
+    const serviceCharge = Number((subtotal * serviceChargeRate).toFixed(2));
+    const total = Number((subtotal + tax + serviceCharge).toFixed(2));
+    bill = {
+      tableNumber: tableStr,
+      items: order.items,
+      subtotal: Number(subtotal.toFixed(2)),
+      tax,
+      serviceCharge,
+      total
+    };
+  }
+
+  res.json({ active: true, order, bill });
+});
+
+// Update order status (ordered -> preparing -> ready -> served) and broadcast to rooms
+app.post('/order/status', (req, res) => {
+  const { tableNumber, status } = req.body;
+
+  if (!tableNumber || !status) {
+    return res.status(400).json({ error: 'tableNumber and status are required.' });
+  }
+
+  const tableStr = String(tableNumber);
+  const order = activeOrders[tableStr];
+
+  if (!order) {
+    return res.status(404).json({ error: `No active order found for table ${tableStr}.` });
+  }
+
+  order.status = status;
+  saveOrders();
+
+  // Broadcast update to staff and customer table rooms
+  io.to('staff').emit('order_status_updated', { tableNumber: tableStr, status });
+  io.to(`table_${tableStr}`).emit('order_status_updated', { tableNumber: tableStr, status });
+
+  console.log(`[Order] Status updated for Table ${tableStr} to ${status}`);
+  res.json({ success: true, order });
 });
 
 app.post('/end-table', (req, res) => {
@@ -186,7 +309,8 @@ app.post('/end-table', (req, res) => {
   const serviceCharge = Number((subtotal * serviceChargeRate).toFixed(2));
   const total = Number((subtotal + tax + serviceCharge).toFixed(2));
 
-  order.status = 'bill_requested';
+  order.status = 'billed';
+  saveOrders();
 
   const billPayload = {
     tableNumber: tableStr,
@@ -199,6 +323,9 @@ app.post('/end-table', (req, res) => {
 
   // Emit "bill_ready" to socket room "table_{tableNumber}"
   io.to(`table_${tableStr}`).emit('bill_ready', billPayload);
+  // Emit "order_status_updated" to staff and table room
+  io.to('staff').emit('order_status_updated', { tableNumber: tableStr, status: 'billed' });
+  io.to(`table_${tableStr}`).emit('order_status_updated', { tableNumber: tableStr, status: 'billed' });
 
   console.log(`[Bill] Sent to Table ${tableStr}: Total = ₹${total}`);
 
@@ -214,13 +341,15 @@ app.post('/payment-done', (req, res) => {
 
   const tableStr = String(tableNumber);
 
-  // Emit "payment_confirmed" to room "staff"
+  // Emit "payment_confirmed" to room "staff" and table room
   io.to('staff').emit('payment_confirmed', { tableNumber: tableStr });
+  io.to(`table_${tableStr}`).emit('payment_confirmed', { tableNumber: tableStr });
 
   console.log(`[Payment] Confirmed for Table ${tableStr}. Clearing order.`);
 
   // Delete from activeOrders
   delete activeOrders[tableStr];
+  saveOrders();
 
   res.json({ success: true });
 });

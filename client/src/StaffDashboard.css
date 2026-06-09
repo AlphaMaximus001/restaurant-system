@@ -223,6 +223,11 @@
   color: #475569;
 }
 
+.status-badge-kitchen.served {
+  background-color: #E0F2FE;
+  color: #0369A1;
+}
+
 /* Action button triggers */
 .action-buttons-wrapper {
   display: flex;
@@ -267,6 +272,16 @@
 
 .action-bill:hover {
   background-color: #D97706;
+  color: #FFFFFF;
+}
+
+.action-serve {
+  color: #0284C7;
+  border-color: #0284C7;
+}
+
+.action-serve:hover {
+  background-color: #0284C7;
   color: #FFFFFF;
 }
 
