@@ -1,0 +1,198 @@
+/* RestauPOS v3.0 Modern Minimalist Stylesheet */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-primary-cta: #27AE60;       /* Green */
+  --color-secondary-cta: #3498DB;     /* Blue */
+  --color-dark-border: #2C3E50;       /* Charcoal Dark Gray */
+  --color-text-body: #334155;         /* Slate/Charcoal Body text */
+  --color-text-header: #1E293B;       /* Deep Slate Headings */
+  --color-bg-light: #F8FAFC;          /* Light gray accent background */
+  --color-bg-white: #FFFFFF;          /* Pure white background */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --status-complete: #27AE60;
+  --status-pending: #F39C12;          /* Yellow/Orange */
+  --status-preparing: #E74C3C;        /* Red */
+  --status-inactive: #95A5A6;         /* Gray */
+}
+
+/* Global Reset & Base Styling */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-body);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-header);
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+h1 { font-size: 24px; }
+h2 { font-size: 20px; }
+h3 { font-size: 18px; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-light);
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Universal Button Styles */
+button, .win-btn {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 12px 20px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+/* Primary CTA: Green Button */
+.btn-primary {
+  background-color: var(--color-primary-cta);
+  color: #FFFFFF;
+  border: 1px solid var(--color-primary-cta);
+}
+.btn-primary:hover {
+  background-color: #219653;
+  border-color: #219653;
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Secondary CTA: Blue Button */
+.btn-secondary-cta {
+  background-color: var(--color-secondary-cta);
+  color: #FFFFFF;
+  border: 1px solid var(--color-secondary-cta);
+}
+.btn-secondary-cta:hover {
+  background-color: #2980B9;
+  border-color: #2980B9;
+}
+
+/* Secondary/Ghost Button: Light gray border, dark text */
+.btn-secondary, button:disabled, .win-btn:disabled {
+  background-color: #FFFFFF;
+  color: var(--color-text-body);
+  border: 1px solid #E2E8F0;
+}
+.btn-secondary:hover {
+  background-color: var(--color-bg-light);
+  border-color: #CBD5E1;
+}
+
+button:disabled, .win-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #F1F5F9;
+}
+
+/* Form Inputs */
+input[type="text"], textarea, .win-input {
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  color: var(--color-text-header);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+input[type="text"]:focus, textarea:focus, .win-input:focus {
+  border-color: var(--color-secondary-cta);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+}
+
+/* Table Style Rule defaults */
+.win-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-bg-white);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.win-table th {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-body);
+  font-weight: 600;
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #E2E8F0;
+  font-size: 14px;
+}
+
+.win-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 14px;
+  color: var(--color-text-body);
+}
+
+.win-table tr {
+  transition: background-color 0.15s ease;
+}
+
+.win-table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* Major screens/components frame wrapper styling */
+.pos-dark-frame {
+  border: 3px solid var(--color-dark-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background-color: var(--color-bg-white);
+}

@@ -1,0 +1,271 @@
+/* Admin Panel Styles */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-body);
+}
+
+/* Sidebar navigation */
+.admin-sidebar {
+  width: 260px;
+  background-color: var(--color-dark-border); /* Dark background */
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.admin-sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.admin-sidebar-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.admin-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-nav-item {
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-nav-item:hover {
+  background-color: rgba(255,255,255,0.05);
+  color: #FFFFFF;
+}
+
+.admin-nav-item.active {
+  background-color: var(--color-secondary-cta); /* Blue highlight */
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Main Area */
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.admin-topbar {
+  background-color: var(--color-bg-white);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.admin-breadcrumb {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.admin-content {
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-section-header h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+/* Menu Management Cards Grid */
+.admin-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Card base */
+.admin-menu-card {
+  background-color: var(--color-bg-white);
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+
+.admin-menu-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
+  border-color: #CBD5E1;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.admin-card-emoji {
+  font-size: 28px;
+}
+
+.admin-card-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-secondary-cta); /* Blue ₹ price */
+}
+
+.admin-card-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text-header);
+  margin: 0 0 6px 0;
+  text-align: left;
+}
+
+.admin-card-desc {
+  font-size: 13px;
+  color: var(--color-text-body);
+  line-height: 1.4;
+  text-align: left;
+  margin-bottom: 12px;
+  min-height: 36px;
+}
+
+.admin-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F1F5F9;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.admin-availability-status {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.admin-availability-status.available {
+  color: var(--color-primary-cta); /* Green text */
+}
+
+.admin-availability-status.out-of-stock {
+  color: #E74C3C; /* Red text */
+}
+
+/* Add Item Modal overlay */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal-box {
+  background-color: var(--color-bg-white);
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  width: 440px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.admin-modal-header {
+  background-color: var(--color-dark-border);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.admin-modal-close-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.admin-modal-close-btn:hover {
+  color: #FFFFFF;
+}
+
+.admin-modal-body {
+  padding: 24px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.admin-form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-body);
+}
+
+.admin-form-select {
+  border: 1px solid #E2E8F0;
+  background-color: #FFFFFF;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 10px;
+  outline: none;
+}
+
+.admin-modal-footer {
+  border-top: 1px solid #F1F5F9;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

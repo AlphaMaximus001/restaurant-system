@@ -1,0 +1,365 @@
+/* RestauPOS v3.0 Modern Minimalist Staff Dashboard Stylesheet */
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%) translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes rowFlash {
+  0% { background-color: #FFFFFF; }
+  50% { background-color: rgba(39, 174, 96, 0.15); }
+  100% { background-color: #FFFFFF; }
+}
+
+/* Base Layout */
+.staff-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-body);
+}
+
+.dashboard-content-area {
+  flex: 1;
+  padding: 32px 32px 80px 32px; /* Bottom padding to clear status bar */
+  box-sizing: border-box;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dashboard-title-area {
+  text-align: left;
+}
+
+.dashboard-title-area h1 {
+  font-size: 28px;
+  color: var(--color-text-header);
+  margin: 0 0 6px 0;
+}
+
+.dashboard-subtitle {
+  font-size: 14px;
+  color: #64748B;
+  margin: 0;
+}
+
+.metrics-badge {
+  background-color: var(--color-bg-white);
+  border: 1px solid #E2E8F0;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.metrics-badge span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.metrics-count {
+  background-color: var(--color-secondary-cta);
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 9999px;
+}
+
+/* Table Frame wrapper */
+.table-container-frame {
+  background-color: var(--color-bg-white);
+  overflow: hidden;
+}
+
+/* Empty State */
+.empty-dashboard-state {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.empty-state-emoji {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-dashboard-state h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+/* Tabular Kitchen Dashboard Grid */
+.kitchen-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.kitchen-orders-table th {
+  background-color: #F8FAFC;
+  color: var(--color-text-header);
+  font-weight: 600;
+  padding: 16px 24px;
+  border-bottom: 1.5px solid #E2E8F0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kitchen-orders-table td {
+  padding: 20px 24px;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.kitchen-orders-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.kitchen-orders-table tbody tr:nth-child(even) {
+  background-color: #FAFAFA;
+}
+
+.kitchen-orders-table tbody tr:hover {
+  background-color: #F1F5F9;
+}
+
+.paid-flash-row {
+  animation: rowFlash 1.5s infinite;
+}
+
+/* Order Item block detail cell styling */
+.order-id-cell {
+  font-weight: 700;
+  color: var(--color-text-header);
+}
+
+.table-number-cell {
+  font-weight: 600;
+  color: var(--color-secondary-cta);
+}
+
+.items-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kitchen-order-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kitchen-order-item .item-name {
+  color: var(--color-text-header);
+}
+
+.item-qty-pill {
+  background-color: #E2E8F0;
+  color: var(--color-text-body);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.item-customization-note {
+  font-size: 12px;
+  color: #E74C3C;
+  font-weight: 500;
+}
+
+/* Status Badges */
+.status-badge-kitchen {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.status-badge-kitchen.ordered {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.status-badge-kitchen.preparing {
+  background-color: #DBEAFE;
+  color: #2563EB;
+}
+
+.status-badge-kitchen.ready {
+  background-color: #D1FAE5;
+  color: #059669;
+}
+
+.status-badge-kitchen.billed {
+  background-color: #E2E8F0;
+  color: #475569;
+}
+
+/* Action button triggers */
+.action-buttons-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-ghost-pill {
+  background-color: transparent;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.action-prepare {
+  color: #2563EB;
+  border-color: #2563EB;
+}
+
+.action-prepare:hover {
+  background-color: #2563EB;
+  color: #FFFFFF;
+}
+
+.action-ready {
+  color: #059669;
+  border-color: #059669;
+}
+
+.action-ready:hover {
+  background-color: #059669;
+  color: #FFFFFF;
+}
+
+.action-bill {
+  color: #D97706;
+  border-color: #D97706;
+}
+
+.action-bill:hover {
+  background-color: #D97706;
+  color: #FFFFFF;
+}
+
+.awaiting-payment-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #94A3B8;
+  font-style: italic;
+}
+
+/* Bottom Status Bar */
+.kitchen-status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background-color: var(--color-dark-border);
+  color: #FFFFFF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 100;
+}
+
+.status-panel {
+  display: flex;
+  align-items: center;
+}
+
+.status-panel strong {
+  color: var(--color-primary-cta);
+  margin-left: 4px;
+}
+
+.status-action-log {
+  flex: 1;
+  padding: 0 32px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.clock-panel {
+  color: rgba(255, 255, 255, 0.9);
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Toast Notifications in top-right */
+.toasts-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.toast-message {
+  background-color: var(--color-bg-white);
+  border: 1px solid #E2E8F0;
+  border-left: 4px solid var(--color-secondary-cta);
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast-message.paid {
+  border-left-color: var(--color-primary-cta);
+}
+
+.toast-message.new-order {
+  border-left-color: #E74C3C;
+}
+
+.toast-message.error {
+  border-left-color: #E74C3C;
+}
+
+.toast-icon {
+  font-size: 18px;
+}
