@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { useSearchParams } from 'react-router-dom';
 import './CustomerScreen.css';
+import { API_URL } from './config';
 
 export default function CustomerScreen() {
   const [menu, setMenu] = useState([]);
@@ -33,7 +34,7 @@ export default function CustomerScreen() {
   // 2. Fetch Menu
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:4000/menu')
+    fetch(`${API_URL}/menu`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch menu');
         return res.json();
@@ -51,7 +52,7 @@ export default function CustomerScreen() {
 
   // 7. Socket.IO connection
   useEffect(() => {
-    const newSocket = io('http://localhost:4000', {
+    const newSocket = io(API_URL, {
       query: { table: tableNumber }
     });
 
@@ -180,7 +181,7 @@ export default function CustomerScreen() {
   const handlePlaceOrder = () => {
     if (cartItems.length === 0) return;
 
-    fetch('http://localhost:4000/order', {
+    fetch(`${API_URL}/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -205,7 +206,7 @@ export default function CustomerScreen() {
 
   // On "Pay Now": POST /payment-done
   const handlePayNow = () => {
-    fetch('http://localhost:4000/payment-done', {
+    fetch(`${API_URL}/payment-done`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tableNumber: tableNumber })

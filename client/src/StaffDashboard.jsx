@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import './StaffDashboard.css';
+import { API_URL } from './config';
 
 export default function StaffDashboard() {
   const [activeOrders, setActiveOrders] = useState({});
@@ -12,7 +13,7 @@ export default function StaffDashboard() {
   const [currentTime, setCurrentTime] = useState(() => new Date().toLocaleTimeString());
 
   const fetchActiveOrders = () => {
-    fetch('http://localhost:4000/active-orders')
+    fetch(`${API_URL}/active-orders`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch active orders');
         return res.json();
@@ -44,7 +45,7 @@ export default function StaffDashboard() {
   useEffect(() => {
     fetchActiveOrders();
 
-    const socket = io('http://localhost:4000', {
+    const socket = io(API_URL, {
       query: { role: 'staff' }
     });
 
@@ -118,7 +119,7 @@ export default function StaffDashboard() {
 
   // "End Table & Bill" -> POST /end-table
   const handleEndTable = (tableNumber) => {
-    fetch('http://localhost:4000/end-table', {
+    fetch(`${API_URL}/end-table`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tableNumber })
