@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
+import { API_URL } from './config';
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function AdminPanel() {
 
   const fetchMenu = () => {
     setLoading(true);
-    fetch('http://localhost:4000/menu')
+    fetch(`${API_URL}/menu`)
       .then(res => res.json())
       .then(data => {
         setMenu(data);
@@ -36,7 +37,7 @@ export default function AdminPanel() {
   }, []);
 
   const handleToggleAvailability = (itemId) => {
-    fetch('http://localhost:4000/menu/toggle', {
+    fetch(`${API_URL}/menu/toggle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: itemId })
@@ -66,7 +67,7 @@ export default function AdminPanel() {
       return;
     }
 
-    fetch('http://localhost:4000/menu', {
+    fetch(`${API_URL}/menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
