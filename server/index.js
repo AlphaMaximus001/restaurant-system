@@ -24,9 +24,23 @@ const server = http.createServer(app);
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
+const corsOriginHandler = (origin, callback) => {
+  if (!origin) return callback(null, true);
+  
+  const isLocal = origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:');
+  const isVercel = /\.vercel\.app$/.test(origin);
+  const isClientUrl = origin === CLIENT_URL;
+  
+  if (isLocal || isVercel || isClientUrl) {
+    callback(null, true);
+  } else {
+    callback(new Error('Not allowed by CORS'));
+  }
+};
+
 // Enable CORS for Express
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: corsOriginHandler,
   credentials: true
 }));
 
@@ -36,7 +50,7 @@ app.use(express.json());
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: corsOriginHandler,
     methods: ['GET', 'POST'],
     credentials: true
   }
