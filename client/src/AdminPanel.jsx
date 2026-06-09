@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import './AdminPanel.css';
 import { API_URL } from './config';
 
@@ -15,7 +16,8 @@ export default function AdminPanel() {
     description: '',
     price: '',
     category: 'Starters',
-    emoji: '🍛'
+    emoji: '🍛',
+    quantity: '10'
   });
 
   const fetchMenu = () => {
@@ -33,8 +35,39 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMenu();
+
+    const socket = io(API_URL);
+
+    socket.on('menu_updated', (updatedMenu) => {
+      console.log('[Socket] Menu updated in admin panel:', updatedMenu);
+      setMenu(updatedMenu);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
+
+  const handleUpdateStock = (itemId, newQty) => {
+    fetch(`${API_URL}/menu/stock`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: itemId, quantity: newQty })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Stock update failed');
+        return res.json();
+      })
+      .then(() => {
+        fetchMenu();
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Could not update stock. Please try again.');
+      });
+  };
 
   const handleToggleAvailability = (itemId) => {
     fetch(`${API_URL}/menu/toggle`, {
@@ -83,7 +116,8 @@ export default function AdminPanel() {
           description: '',
           price: '',
           category: 'Starters',
-          emoji: '🍛'
+          emoji: '🍛',
+          quantity: '10'
         });
         fetchMenu(); // Re-fetch menu to show new item
       })
@@ -146,6 +180,39 @@ export default function AdminPanel() {
                     </div>
                     <h3 className="admin-card-title">{item.name}</h3>
                     <p className="admin-card-desc">{item.description || 'No description provided.'}</p>
+                  </div>
+
+                  <div className="admin-stock-control" style={{ margin: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px dashed #E2E8F0', paddingTop: '10px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '500', color: 'var(--color-text-body)' }}>
+                      Stock: <strong>{item.quantity !== undefined ? item.quantity : 0}</strong>
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button 
+                        className="btn-secondary" 
+                        style={{ padding: '2px 8px', fontSize: '12px', minWidth: '24px', height: '24px' }}
+                        onClick={() => handleUpdateStock(item.id, Math.max(0, (item.quantity || 0) - 1))}
+                        disabled={(item.quantity || 0) <= 0}
+                      >
+                        -
+                      </button>
+                      <input 
+                        type="number" 
+                        value={item.quantity !== undefined ? item.quantity : 0} 
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          handleUpdateStock(item.id, isNaN(val) ? 0 : Math.max(0, val));
+                        }}
+                        style={{ width: '45px', textAlign: 'center', padding: '2px', fontSize: '12px', height: '24px', border: '1px solid #CBD5E1', borderRadius: '4px' }}
+                        min="0"
+                      />
+                      <button 
+                        className="btn-secondary" 
+                        style={{ padding: '2px 8px', fontSize: '12px', minWidth: '24px', height: '24px' }}
+                        onClick={() => handleUpdateStock(item.id, (item.quantity || 0) + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
 
                   <div className="admin-card-footer">
@@ -211,6 +278,20 @@ export default function AdminPanel() {
                     value={formData.price} 
                     onChange={handleFormChange}
                     placeholder="e.g. 70" 
+                    required 
+                  />
+                </div>
+
+                <div className="admin-form-group">
+                  <label className="admin-form-label">Quantity / Servings Available *</label>
+                  <input 
+                    type="number" 
+                    name="quantity" 
+                    className="win-input" 
+                    value={formData.quantity} 
+                    onChange={handleFormChange}
+                    placeholder="e.g. 10" 
+                    min="0"
                     required 
                   />
                 </div>

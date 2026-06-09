@@ -62,25 +62,25 @@ const ORDERS_FILE = path.join(__dirname, 'orders.json');
 // In-memory data
 let menu = [
   // Starters
-  { id: '1', name: 'Paneer Tikka', description: 'Cottage cheese marinated in spices, grilled in tandoor', price: 220, category: 'Starters', emoji: '🧀', available: true },
-  { id: '2', name: 'Veg Seekh Kebab', description: 'Minced vegetables with herbs, skewered and grilled', price: 180, category: 'Starters', emoji: '🌿', available: true },
-  { id: '3', name: 'Samosa (2 pcs)', description: 'Crispy pastry filled with spiced potatoes and peas', price: 60, category: 'Starters', emoji: '🔺', available: true },
-  { id: '4', name: 'Hara Bhara Kebab', description: 'Spinach and paneer patties, shallow fried', price: 160, category: 'Starters', emoji: '🟢', available: true },
-  { id: '5', name: 'Chicken Tikka', description: 'Boneless chicken in yogurt and spice marinade, tandoor grilled', price: 260, category: 'Starters', emoji: '🍗', available: true },
+  { id: '1', name: 'Paneer Tikka', description: 'Cottage cheese marinated in spices, grilled in tandoor', price: 220, category: 'Starters', emoji: '🧀', quantity: 10, available: true },
+  { id: '2', name: 'Veg Seekh Kebab', description: 'Minced vegetables with herbs, skewered and grilled', price: 180, category: 'Starters', emoji: '🌿', quantity: 10, available: true },
+  { id: '3', name: 'Samosa (2 pcs)', description: 'Crispy pastry filled with spiced potatoes and peas', price: 60, category: 'Starters', emoji: '🔺', quantity: 10, available: true },
+  { id: '4', name: 'Hara Bhara Kebab', description: 'Spinach and paneer patties, shallow fried', price: 160, category: 'Starters', emoji: '🟢', quantity: 10, available: true },
+  { id: '5', name: 'Chicken Tikka', description: 'Boneless chicken in yogurt and spice marinade, tandoor grilled', price: 260, category: 'Starters', emoji: '🍗', quantity: 10, available: true },
   // Mains
-  { id: '6', name: 'Dal Makhani', description: 'Slow cooked black lentils in buttery tomato gravy', price: 220, category: 'Mains', emoji: '🍲', available: true },
-  { id: '7', name: 'Paneer Butter Masala', description: 'Cottage cheese in rich tomato and cashew gravy', price: 260, category: 'Mains', emoji: '🧆', available: true },
-  { id: '8', name: 'Chicken Biryani', description: 'Fragrant basmati rice layered with spiced chicken', price: 320, category: 'Mains', emoji: '🍚', available: true },
-  { id: '9', name: 'Mutton Rogan Josh', description: 'Slow cooked mutton in Kashmiri spices', price: 380, category: 'Mains', emoji: '🥘', available: true },
-  { id: '10', name: 'Palak Paneer', description: 'Cottage cheese in spiced spinach gravy', price: 240, category: 'Mains', emoji: '🥬', available: true },
-  { id: '11', name: 'Butter Naan', description: 'Leavened bread baked in tandoor with butter', price: 50, category: 'Mains', emoji: '🫓', available: true },
-  { id: '12', name: 'Jeera Rice', description: 'Basmati rice tempered with cumin', price: 120, category: 'Mains', emoji: '🍙', available: true },
+  { id: '6', name: 'Dal Makhani', description: 'Slow cooked black lentils in buttery tomato gravy', price: 220, category: 'Mains', emoji: '🍲', quantity: 15, available: true },
+  { id: '7', name: 'Paneer Butter Masala', description: 'Cottage cheese in rich tomato and cashew gravy', price: 260, category: 'Mains', emoji: '🧆', quantity: 15, available: true },
+  { id: '8', name: 'Chicken Biryani', description: 'Fragrant basmati rice layered with spiced chicken', price: 320, category: 'Mains', emoji: '🍚', quantity: 15, available: true },
+  { id: '9', name: 'Mutton Rogan Josh', description: 'Slow cooked mutton in Kashmiri spices', price: 380, category: 'Mains', emoji: '🥘', quantity: 15, available: true },
+  { id: '10', name: 'Palak Paneer', description: 'Cottage cheese in spiced spinach gravy', price: 240, category: 'Mains', emoji: '🥬', quantity: 15, available: true },
+  { id: '11', name: 'Butter Naan', description: 'Leavened bread baked in tandoor with butter', price: 50, category: 'Mains', emoji: '🫓', quantity: 15, available: true },
+  { id: '12', name: 'Jeera Rice', description: 'Basmati rice tempered with cumin', price: 120, category: 'Mains', emoji: '🍙', quantity: 15, available: true },
   // Drinks
-  { id: '13', name: 'Mango Lassi', description: 'Chilled yogurt drink blended with fresh mango', price: 90, category: 'Drinks', emoji: '🥭', available: true },
-  { id: '14', name: 'Masala Chai', description: 'Spiced Indian tea with milk', price: 40, category: 'Drinks', emoji: '☕', available: true },
-  { id: '15', name: 'Sweet Lassi', description: 'Chilled sweetened yogurt drink', price: 70, category: 'Drinks', emoji: '🥛', available: true },
-  { id: '16', name: 'Fresh Lime Soda', description: 'Chilled lime juice with soda water', price: 60, category: 'Drinks', emoji: '🍋', available: true },
-  { id: '17', name: 'Rooh Afza Sharbat', description: 'Rose flavored chilled drink', price: 55, category: 'Drinks', emoji: '🌹', available: true }
+  { id: '13', name: 'Mango Lassi', description: 'Chilled yogurt drink blended with fresh mango', price: 90, category: 'Drinks', emoji: '🥭', quantity: 20, available: true },
+  { id: '14', name: 'Masala Chai', description: 'Spiced Indian tea with milk', price: 40, category: 'Drinks', emoji: '☕', quantity: 20, available: true },
+  { id: '15', name: 'Sweet Lassi', description: 'Chilled sweetened yogurt drink', price: 70, category: 'Drinks', emoji: '🥛', quantity: 20, available: true },
+  { id: '16', name: 'Fresh Lime Soda', description: 'Chilled lime juice with soda water', price: 60, category: 'Drinks', emoji: '🍋', quantity: 20, available: true },
+  { id: '17', name: 'Rooh Afza Sharbat', description: 'Rose flavored chilled drink', price: 55, category: 'Drinks', emoji: '🌹', quantity: 20, available: true }
 ];
 
 // Active orders keyed by tableNumber
@@ -90,6 +90,19 @@ let activeOrders = {};
 if (fs.existsSync(MENU_FILE)) {
   try {
     menu = JSON.parse(fs.readFileSync(MENU_FILE, 'utf8'));
+    let migrated = false;
+    menu.forEach(item => {
+      if (item.quantity === undefined) {
+        if (item.category === 'Starters') item.quantity = 10;
+        else if (item.category === 'Mains') item.quantity = 15;
+        else item.quantity = 20;
+        migrated = true;
+      }
+    });
+    if (migrated) {
+      saveMenu();
+      console.log('[Persistence] Migrated menu.json with default quantities');
+    }
     console.log('[Persistence] Menu loaded from menu.json');
   } catch (err) {
     console.error('[Persistence] Error loading menu.json:', err.message);
@@ -140,11 +153,13 @@ app.get('/active-orders', (req, res) => {
 
 // Admin REST endpoints
 app.post('/menu', (req, res) => {
-  const { name, description, price, category, emoji } = req.body;
+  const { name, description, price, category, emoji, quantity } = req.body;
 
   if (!name || !price || !category || !emoji) {
     return res.status(400).json({ error: 'Name, price, category, and emoji are required.' });
   }
+
+  const qtyVal = quantity !== undefined ? Number(quantity) : 10;
 
   const newItem = {
     id: String(menu.length + 1),
@@ -153,11 +168,13 @@ app.post('/menu', (req, res) => {
     price: Number(price),
     category,
     emoji,
-    available: true
+    quantity: isNaN(qtyVal) ? 10 : qtyVal,
+    available: (isNaN(qtyVal) ? 10 : qtyVal) > 0
   };
 
   menu.push(newItem);
   saveMenu();
+  io.emit('menu_updated', menu);
   console.log(`[Admin] Added new menu item: ${name}`);
   res.json({ success: true, item: newItem });
 });
@@ -176,8 +193,38 @@ app.post('/menu/toggle', (req, res) => {
   }
 
   item.available = !item.available;
+  if (item.available && item.quantity <= 0) {
+    item.quantity = 10; // reset stock to default if manually re-enabling
+  }
   saveMenu();
+  io.emit('menu_updated', menu);
   console.log(`[Admin] Toggled availability of ${item.name} to ${item.available}`);
+  res.json({ success: true, item });
+});
+
+app.post('/menu/stock', (req, res) => {
+  const { id, quantity } = req.body;
+
+  if (!id || quantity === undefined) {
+    return res.status(400).json({ error: 'Item ID and quantity are required.' });
+  }
+
+  const item = menu.find(i => i.id === String(id));
+
+  if (!item) {
+    return res.status(404).json({ error: 'Menu item not found.' });
+  }
+
+  const newQty = Number(quantity);
+  if (isNaN(newQty) || newQty < 0) {
+    return res.status(400).json({ error: 'Quantity must be a non-negative number.' });
+  }
+
+  item.quantity = newQty;
+  item.available = newQty > 0;
+  saveMenu();
+  io.emit('menu_updated', menu);
+  console.log(`[Admin] Updated stock of ${item.name} to ${item.quantity} (Available: ${item.available})`);
   res.json({ success: true, item });
 });
 
@@ -186,6 +233,37 @@ app.post('/order', (req, res) => {
 
   if (!tableNumber || !items || !Array.isArray(items)) {
     return res.status(400).json({ error: 'tableNumber and items array are required.' });
+  }
+
+  // 1. Verify stock availability first for all items in order
+  for (const ordItem of items) {
+    const menuItem = menu.find(i => i.id === String(ordItem.id));
+    if (!menuItem) {
+      return res.status(404).json({ error: `Menu item with ID ${ordItem.id} not found.` });
+    }
+    if (!menuItem.available || menuItem.quantity < ordItem.qty) {
+      return res.status(400).json({ 
+        error: `Insufficient stock for ${menuItem.name}. Available: ${menuItem.quantity || 0}, Ordered: ${ordItem.qty}` 
+      });
+    }
+  }
+
+  // 2. Deduct stock and update availability
+  let stockUpdated = false;
+  items.forEach(ordItem => {
+    const menuItem = menu.find(i => i.id === String(ordItem.id));
+    if (menuItem) {
+      menuItem.quantity = Math.max(0, menuItem.quantity - ordItem.qty);
+      if (menuItem.quantity === 0) {
+        menuItem.available = false;
+      }
+      stockUpdated = true;
+    }
+  });
+
+  if (stockUpdated) {
+    saveMenu();
+    io.emit('menu_updated', menu);
   }
 
   const tableStr = String(tableNumber);

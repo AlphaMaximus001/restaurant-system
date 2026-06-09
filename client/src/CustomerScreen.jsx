@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useSearchParams } from 'react-router-dom';
 import './CustomerScreen.css';
@@ -22,7 +22,6 @@ export default function CustomerScreen() {
   // View states: 'menu' | 'ordered' | 'bill' | 'paid'
   const [view, setView] = useState('menu');
   const [bill, setBill] = useState(null);
-  const [socket, setSocket] = useState(null);
   const [orderStatus, setOrderStatus] = useState('ordered');
 
   // Customization Modal State
@@ -34,6 +33,7 @@ export default function CustomerScreen() {
 
   // 2. Fetch Menu
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetch(`${API_URL}/menu`)
       .then(res => {
@@ -84,18 +84,17 @@ export default function CustomerScreen() {
       'preparing': 2,
       'ready': 3,
       'served': 4,
-      'billed': 5,
-      'bill_requested': 5
+      'billed': 4,
+      'bill_requested': 4
     };
 
     const currentLevel = statusLevels[orderStatus] || 1;
 
     const steps = {
-      'placed': 1,
-      'accepted': 2,
-      'preparing': 3,
-      'ready': 4,
-      'served': 5
+      'ordered': 1,
+      'preparing': 2,
+      'ready': 3,
+      'served': 4
     };
 
     const stepLevel = steps[stepName];
@@ -135,14 +134,18 @@ export default function CustomerScreen() {
       }
     });
 
+    // On "menu_updated" event: update menu state
+    newSocket.on('menu_updated', (updatedMenu) => {
+      console.log('[Socket] Menu updated:', updatedMenu);
+      setMenu(updatedMenu);
+    });
+
     // 10. On "payment_confirmed" event: transition to paid screen
     newSocket.on('payment_confirmed', () => {
       console.log('[Socket] Payment confirmed by server');
       setView('paid');
       setBill(null);
     });
-
-    setSocket(newSocket);
 
     return () => {
       newSocket.disconnect();
@@ -182,6 +185,18 @@ export default function CustomerScreen() {
   const handleAddToCart = (e) => {
     e.preventDefault();
     if (!selectedCustomizeItem) return;
+
+    // Check available stock
+    const itemMenu = menu.find(i => i.id === selectedCustomizeItem.id);
+    const availableStock = itemMenu && itemMenu.quantity !== undefined ? itemMenu.quantity : 999;
+    const totalQtyInCart = Object.values(cart)
+      .filter(item => item.id === selectedCustomizeItem.id)
+      .reduce((sum, item) => sum + item.qty, 0);
+
+    if (totalQtyInCart + 1 > availableStock) {
+      alert(`Cannot add more. Only ${availableStock} portions of ${selectedCustomizeItem.name} are available.`);
+      return;
+    }
 
     const finalUnitPrice = getModalItemPrice();
     const parts = [];
@@ -234,6 +249,19 @@ export default function CustomerScreen() {
       if (!currentItem) return prevCart;
 
       const newQty = Math.max(0, currentItem.qty + delta);
+      if (delta > 0) {
+        const itemMenu = menu.find(i => i.id === currentItem.id);
+        const availableStock = itemMenu && itemMenu.quantity !== undefined ? itemMenu.quantity : 999;
+        const totalQtyInCart = Object.values(prevCart)
+          .filter(item => item.id === currentItem.id)
+          .reduce((sum, item) => sum + (item.cartKey === cartKey ? newQty : item.qty), 0);
+
+        if (totalQtyInCart > availableStock) {
+          alert(`Only ${availableStock} servings of ${currentItem.name} are available.`);
+          return prevCart;
+        }
+      }
+
       const updatedCart = { ...prevCart };
       if (newQty === 0) {
         delete updatedCart[cartKey];
@@ -347,23 +375,13 @@ export default function CustomerScreen() {
           <div className="timeline-container">
             <div className="timeline-line"></div>
             
-            <div className={`timeline-step ${getStepStatus('placed').className}`}>
-              <div className={`timeline-node ${getStepStatus('placed').className === 'active' ? 'pulse' : ''}`}>
-                {getStepStatus('placed').node}
+            <div className={`timeline-step ${getStepStatus('ordered').className}`}>
+              <div className={`timeline-node ${getStepStatus('ordered').className === 'active' ? 'pulse' : ''}`}>
+                {getStepStatus('ordered').node}
               </div>
               <div className="timeline-info">
                 <h4>Order Placed</h4>
                 <p>Sent directly to kitchen</p>
-              </div>
-            </div>
-            
-            <div className={`timeline-step ${getStepStatus('accepted').className}`}>
-              <div className={`timeline-node ${getStepStatus('accepted').className === 'active' ? 'pulse' : ''}`}>
-                {getStepStatus('accepted').node}
-              </div>
-              <div className="timeline-info">
-                <h4>Accepted</h4>
-                <p>Kitchen staff confirmed</p>
               </div>
             </div>
             
@@ -531,7 +549,7 @@ export default function CustomerScreen() {
         {/* Menu Cards Grid */}
         <div className="menu-cards-grid">
           {filteredMenu.map((item, index) => {
-            const isAvailable = item.available !== false;
+            const isAvailable = item.available !== false && (item.quantity === undefined || item.quantity > 0);
             return (
               <div 
                 key={item.id} 
@@ -543,6 +561,11 @@ export default function CustomerScreen() {
                   <div className="item-details">
                     <h3 className="item-name">{item.name}</h3>
                     <p className="item-description">{item.description || 'Tasty authentic dish.'}</p>
+                    {isAvailable && item.quantity !== undefined && (
+                      <span className="item-stock-tag" style={{ fontSize: '12px', color: '#27AE60', fontWeight: '600', display: 'block', marginTop: '4px' }}>
+                        ● {item.quantity} portions left
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="card-bottom">

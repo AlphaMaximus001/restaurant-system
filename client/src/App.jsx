@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import CustomerScreen from './CustomerScreen';
 import StaffDashboard from './StaffDashboard';

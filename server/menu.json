@@ -1,0 +1,172 @@
+[
+  {
+    "id": "1",
+    "name": "Paneer Tikka",
+    "description": "Cottage cheese marinated in spices, grilled in tandoor",
+    "price": 220,
+    "category": "Starters",
+    "emoji": "🧀",
+    "quantity": 10,
+    "available": true
+  },
+  {
+    "id": "2",
+    "name": "Veg Seekh Kebab",
+    "description": "Minced vegetables with herbs, skewered and grilled",
+    "price": 180,
+    "category": "Starters",
+    "emoji": "🌿",
+    "quantity": 10,
+    "available": true
+  },
+  {
+    "id": "3",
+    "name": "Samosa (2 pcs)",
+    "description": "Crispy pastry filled with spiced potatoes and peas",
+    "price": 60,
+    "category": "Starters",
+    "emoji": "🔺",
+    "quantity": 10,
+    "available": true
+  },
+  {
+    "id": "4",
+    "name": "Hara Bhara Kebab",
+    "description": "Spinach and paneer patties, shallow fried",
+    "price": 160,
+    "category": "Starters",
+    "emoji": "🟢",
+    "quantity": 10,
+    "available": true
+  },
+  {
+    "id": "5",
+    "name": "Chicken Tikka",
+    "description": "Boneless chicken in yogurt and spice marinade, tandoor grilled",
+    "price": 260,
+    "category": "Starters",
+    "emoji": "🍗",
+    "quantity": 10,
+    "available": true
+  },
+  {
+    "id": "6",
+    "name": "Dal Makhani",
+    "description": "Slow cooked black lentils in buttery tomato gravy",
+    "price": 220,
+    "category": "Mains",
+    "emoji": "🍲",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "7",
+    "name": "Paneer Butter Masala",
+    "description": "Cottage cheese in rich tomato and cashew gravy",
+    "price": 260,
+    "category": "Mains",
+    "emoji": "🧆",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "8",
+    "name": "Chicken Biryani",
+    "description": "Fragrant basmati rice layered with spiced chicken",
+    "price": 320,
+    "category": "Mains",
+    "emoji": "🍚",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "9",
+    "name": "Mutton Rogan Josh",
+    "description": "Slow cooked mutton in Kashmiri spices",
+    "price": 380,
+    "category": "Mains",
+    "emoji": "🥘",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "10",
+    "name": "Palak Paneer",
+    "description": "Cottage cheese in spiced spinach gravy",
+    "price": 240,
+    "category": "Mains",
+    "emoji": "🥬",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "11",
+    "name": "Butter Naan",
+    "description": "Leavened bread baked in tandoor with butter",
+    "price": 50,
+    "category": "Mains",
+    "emoji": "🫓",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "12",
+    "name": "Jeera Rice",
+    "description": "Basmati rice tempered with cumin",
+    "price": 120,
+    "category": "Mains",
+    "emoji": "🍙",
+    "quantity": 15,
+    "available": true
+  },
+  {
+    "id": "13",
+    "name": "Mango Lassi",
+    "description": "Chilled yogurt drink blended with fresh mango",
+    "price": 90,
+    "category": "Drinks",
+    "emoji": "🥭",
+    "quantity": 20,
+    "available": true
+  },
+  {
+    "id": "14",
+    "name": "Masala Chai",
+    "description": "Spiced Indian tea with milk",
+    "price": 40,
+    "category": "Drinks",
+    "emoji": "☕",
+    "quantity": 20,
+    "available": true
+  },
+  {
+    "id": "15",
+    "name": "Sweet Lassi",
+    "description": "Chilled sweetened yogurt drink",
+    "price": 70,
+    "category": "Drinks",
+    "emoji": "🥛",
+    "quantity": 20,
+    "available": true
+  },
+  {
+    "id": "16",
+    "name": "Fresh Lime Soda",
+    "description": "Chilled lime juice with soda water",
+    "price": 60,
+    "category": "Drinks",
+    "emoji": "🍋",
+    "quantity": 20,
+    "available": true
+  },
+  {
+    "id": "17",
+    "name": "Rooh Afza Sharbat",
+    "description": "Rose flavored chilled drink",
+    "price": 55,
+    "category": "Drinks",
+    "emoji": "🌹",
+    "quantity": 20,
+    "available": true
+  }
+]
